@@ -7,15 +7,15 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
-def load_private_key(private_key_path):
+def load_private_key(private_key_path, privkey_pwd):
     # Prompt the user for the password
-    password = getpass.getpass("Enter the private key password: ").encode()
+    password = privkey_pwd
     
     # Load the private key using the provided password
     with open(private_key_path, "rb") as key_file:
         private_key = serialization.load_pem_private_key(
             key_file.read(),
-            password=password,
+            password=password.encode(),
             backend=default_backend()
         )
     return private_key
@@ -42,16 +42,15 @@ def save_file(filename, data):
     with open(filename, "wb") as f:
         f.write(data)
 
-def main():
+def main(port=12345, privkey_entry=None, privkey_pwd=None):  # Default to 12345 if no port is provided
     # Load the server's private key
-    PRIVATE_KEY_PATH = input("Enter the path of the Receiver's private key: ")  
-    private_key = load_private_key(PRIVATE_KEY_PATH)
+    private_key = load_private_key(privkey_entry, privkey_pwd)
 
     # Set up the server
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind(('0.0.0.0', 12345))  # Change port as needed
+    server_socket.bind(('0.0.0.0', port))  # Bind to the specified port
     server_socket.listen(1)
-    print("Server listening on port 12345...")
+    print(f"Server listening on port {port}...")
 
     while True:
         conn, addr = server_socket.accept()
@@ -79,7 +78,7 @@ def main():
 
         # Save the decrypted file
         save_file(filename, decrypted_data)
-        print(f"File '{filename}' received and hhhhhhjhuuuuuuuuudecrypted successfully.")
+        print(f"File '{filename}' received and decrypted successfully.")
 
         conn.close()
 

@@ -54,4 +54,3 @@ if __name__ == "__main__":
         print(f"Error: The file '{FILE_PATH}' does not exist.")
     else:
         send_file(SERVER_IP, SERVER_PORT, FILE_PATH, aes_key, PUBLIC_KEY_PATH)
-gh
