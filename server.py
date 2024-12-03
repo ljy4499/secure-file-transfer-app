@@ -21,6 +21,7 @@ def load_private_key(private_key_path, privkey_pwd):
     return private_key
 
 def decrypt_aes_key(encrypted_aes_key, private_key):
+    # Decrypt the AES key using the private RSA key
     aes_key = private_key.decrypt(
         encrypted_aes_key,
         padding.OAEP(
@@ -43,44 +44,58 @@ def save_file(filename, data):
         f.write(data)
 
 def main(port=12345, privkey_entry=None, privkey_pwd=None):  # Default to 12345 if no port is provided
-    # Load the server's private key
-    private_key = load_private_key(privkey_entry, privkey_pwd)
+    try:
+        # Load the server's private key
+        private_key = load_private_key(privkey_entry, privkey_pwd)
+    except Exception as e:
+        print(f"Error loading private key: {e}")
+        return
 
-    # Set up the server
+    # Set up the server socket
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind(('0.0.0.0', port))  # Bind to the specified port
-    server_socket.listen(1)
+    server_socket.bind(('0.0.0.0', port))  # Bind to all available IP addresses on the local machine
+    server_socket.listen(1)  # Listen for incoming connections
     print(f"Server listening on port {port}...")
 
     while True:
         conn, addr = server_socket.accept()
         print(f"Connection from {addr} accepted.")
 
-        # Receive the filename length and filename
-        filename_length = int.from_bytes(conn.recv(4), 'big')
-        filename = conn.recv(filename_length).decode('utf-8')
-        
-        # Receive the length of the encrypted AES key and then the encrypted AES key
-        encrypted_aes_key_length = int.from_bytes(conn.recv(4), 'big')
-        encrypted_aes_key = conn.recv(encrypted_aes_key_length)
-        
-        print(f"Server received encrypted AES key length: {len(encrypted_aes_key)} bytes")
+        try:
+            # Receive the filename length and filename
+            filename_length = int.from_bytes(conn.recv(4), 'big')
+            filename = conn.recv(filename_length).decode('utf-8')
+            print(f"Received filename: {filename}")
 
-        # Decrypt the AES key
-        aes_key = decrypt_aes_key(encrypted_aes_key, private_key)
+            # Receive the length of the encrypted AES key and then the encrypted AES key
+            encrypted_aes_key_length = int.from_bytes(conn.recv(4), 'big')
+            encrypted_aes_key = conn.recv(encrypted_aes_key_length)
+            print(f"Server received encrypted AES key length: {len(encrypted_aes_key)} bytes")
 
-        # Receive the encrypted file data length and encrypted file data
-        encrypted_data_length = int.from_bytes(conn.recv(4), 'big')
-        encrypted_data = conn.recv(encrypted_data_length)
+            # Decrypt the AES key
+            aes_key = decrypt_aes_key(encrypted_aes_key, private_key)
+            print(f"Decrypted AES key: {aes_key.hex()[:50]}...")  # Log part of the AES key for debug
 
-        # Decrypt the file data
-        decrypted_data = decrypt_file(encrypted_data, aes_key)
+            # Receive the length of the encrypted file data
+            encrypted_data_length = int.from_bytes(conn.recv(4), 'big')
+            encrypted_data = conn.recv(encrypted_data_length)
+            print(f"Received encrypted data, length: {len(encrypted_data)} bytes.")
 
-        # Save the decrypted file
-        save_file(filename, decrypted_data)
-        print(f"File '{filename}' received and decrypted successfully.")
+            # Decrypt the file data
+            decrypted_data = decrypt_file(encrypted_data, aes_key)
+            print(f"Decrypted data preview: {decrypted_data[:50]}")  # First 50 bytes of decrypted data for check
 
-        conn.close()
+            # Save the decrypted file
+            save_file(filename, decrypted_data)
+            print(f"File '{filename}' received and decrypted successfully.")
+
+        except Exception as e:
+            print(f"Error during transmission or decryption: {e}")
+        finally:
+            conn.close()
 
 if __name__ == "__main__":
-    main()
+    # Prompt user for private key password and path
+    privkey_entry = input("Enter the path to the private key: ")
+    privkey_pwd = getpass.getpass("Enter the private key password: ")  # securely get the password
+    main(privkey_entry=privkey_entry, privkey_pwd=privkey_pwd)

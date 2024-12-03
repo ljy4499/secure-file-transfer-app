@@ -11,7 +11,7 @@ def browse_privkey():
 
 def start_server():
     port = int(port_entry.get())
-    privkey_ent = privkey_entry.get()
+    privkey_ent = privkey_entry .get()
     privkey_pass = privkey_pwd.get()
 
     if not (port and privkey_ent and privkey_pass):
