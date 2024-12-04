@@ -46,13 +46,19 @@ def send_file(server_ip, server_port, file_path, aes_key, public_key_path):
         print(f"Sending encrypted file, length: {len(encrypted_file)} bytes.")
         print("File transmission completed.")
 
+# Main function to select and send multiple files
 if __name__ == "__main__":
     SERVER_IP = input("Enter the server IP address (default: 127.0.0.1): ").strip() or '127.0.0.1'
     SERVER_PORT = input("Enter the server port (default: 12345): ").strip()
     SERVER_PORT = int(SERVER_PORT) if SERVER_PORT else 12345
 
-    # Get the file path input from the user
-    FILE_PATH = input("Enter the path of the file you want to send: ")
+    # Allow the user to select multiple files
+    from tkinter import filedialog
+    FILE_PATHS = filedialog.askopenfilenames(title="Select Files to Send")  # Select multiple files
+
+    if not FILE_PATHS:
+        print("No files selected.")
+        exit(1)
 
     # Get the AES key input from the user
     aes_key_input = input("Enter the AES key (32 bytes for AES-256, in hex format): ")
@@ -68,10 +74,13 @@ if __name__ == "__main__":
     # Path to the server's public key file
     PUBLIC_KEY_PATH = input("Enter the path of the Receiver's public key: ")
 
-    # Verify the file path
-    if not os.path.isfile(FILE_PATH):
-        print(f"Error: The file '{FILE_PATH}' does not exist.")
-    elif not os.path.isfile(PUBLIC_KEY_PATH):
+    if not os.path.isfile(PUBLIC_KEY_PATH):
         print(f"Error: The public key file '{PUBLIC_KEY_PATH}' does not exist.")
-    else:
-        send_file(SERVER_IP, SERVER_PORT, FILE_PATH, aes_key, PUBLIC_KEY_PATH)
+        exit(1)
+
+    # Loop over the selected files and send each one
+    for file_path in FILE_PATHS:
+        if not os.path.isfile(file_path):
+            print(f"Error: The file '{file_path}' does not exist.")
+            continue
+        send_file(SERVER_IP, SERVER_PORT, file_path, aes_key, PUBLIC_KEY_PATH)
