@@ -1,6 +1,7 @@
 import socket
 import os
 import getpass
+import hashlib
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import hashes
@@ -36,6 +37,12 @@ def decrypt_file(encrypted_data, aes_key):
     decrypted_data = decryptor.update(encrypted_data[16:]) + decryptor.finalize()
     return decrypted_data
 
+def calculate_file_hash(data):
+    """Calculate SHA-256 hash of the given data."""
+    sha256 = hashlib.sha256()
+    sha256.update(data)
+    return sha256.hexdigest()
+
 def save_file(filename, data):
     os.makedirs('./download', exist_ok=True)
     file_path = os.path.join('./download', filename)
@@ -69,6 +76,11 @@ def main(port=12345, privkey_entry=None, privkey_pwd=None):  # Default to 12345 
                 filename = conn.recv(filename_length).decode('utf-8')
                 print(f"Received filename: {filename}")
 
+                # Receive the file hash length and the hash itself
+                file_hash_length = int.from_bytes(conn.recv(4), 'big')
+                file_hash = conn.recv(file_hash_length).decode('utf-8')
+                print(f"Received file hash: {file_hash}")
+
                 # Receive the length of the encrypted AES key and then the encrypted AES key
                 encrypted_aes_key_length = int.from_bytes(conn.recv(4), 'big')
                 encrypted_aes_key = conn.recv(encrypted_aes_key_length)
@@ -86,6 +98,14 @@ def main(port=12345, privkey_entry=None, privkey_pwd=None):  # Default to 12345 
                 # Decrypt the file data
                 decrypted_data = decrypt_file(encrypted_data, aes_key)
                 print(f"Decrypted data preview: {decrypted_data[:50]}")  # First 50 bytes of decrypted data for check
+
+                # Verify the file's integrity
+                calculated_hash = calculate_file_hash(decrypted_data)
+                print(f"Calculated hash: {calculated_hash}")
+                if calculated_hash == file_hash:
+                    print("Hash verification successful. File integrity confirmed.")
+                else:
+                    print("Hash verification failed. File integrity compromised.")
 
                 # Save the decrypted file
                 save_file(filename, decrypted_data)

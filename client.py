@@ -1,11 +1,24 @@
 import socket
 import os
+import hashlib
 from aes_encrypt import encrypt_file
 from rsa_encrypt import encrypt_aes_key, load_public_key
+
+def calculate_file_hash(file_path):
+    """Calculate SHA-256 hash of a file."""
+    sha256 = hashlib.sha256()
+    with open(file_path, 'rb') as f:
+        while chunk := f.read(8192):  # Read in chunks to handle large files
+            sha256.update(chunk)
+    return sha256.hexdigest()
 
 def send_file(server_ip, server_port, file_path, aes_key, public_key_path):
     # Extract the filename from the file path
     filename = os.path.basename(file_path)
+
+    # Calculate the file hash
+    file_hash = calculate_file_hash(file_path)
+    print(f"Calculated file hash (SHA-256): {file_hash}")
 
     # Encrypt the file using the provided AES key
     encrypted_file = encrypt_file(file_path, aes_key)
@@ -34,6 +47,12 @@ def send_file(server_ip, server_port, file_path, aes_key, public_key_path):
         client_socket.sendall(len(encoded_filename).to_bytes(4, 'big'))  # Send filename length
         client_socket.sendall(encoded_filename)  # Send filename
         print(f"Sending filename: {filename}, length: {len(encoded_filename)} bytes.")
+
+        # Send the file hash
+        encoded_file_hash = file_hash.encode('utf-8')
+        client_socket.sendall(len(encoded_file_hash).to_bytes(4, 'big'))  # Send hash length
+        client_socket.sendall(encoded_file_hash)  # Send file hash
+        print(f"Sending file hash: {file_hash}, length: {len(encoded_file_hash)} bytes.")
 
         # Send the encrypted AES key
         client_socket.sendall(len(encrypted_aes_key).to_bytes(4, 'big'))  # Send the length of the AES key
