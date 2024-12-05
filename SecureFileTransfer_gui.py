@@ -42,28 +42,28 @@ def start_server():
     status_label.configure(text=f"Server running on port {port}...")
 
 # Function to send the file (Send section)
-# Function to send the file (Send section)
 def send():
     server_ip = ip_entry.get()
     server_port = int(port_entry.get())
     aes_key = aes_key_entry.get()
     public_key_path = pubkey_entry.get()
-
-    # Get file paths from the CTkTextbox
-    file_paths = file_listbox.get(1.0, ctk.END).strip().split("\n")  # Get all text and split by lines
+    file_paths = file_listbox.get(1.0, ctk.END).strip().split("\n")
 
     if not (server_ip and server_port and aes_key and file_paths and public_key_path):
         messagebox.showerror("Error", "All fields are required!")
         return
-    
+
     try:
         aes_key_bytes = bytes.fromhex(aes_key)
         for file_path in file_paths:
-            if file_path:  # Ensure non-empty file paths
+            if file_path:
                 send_file(server_ip, server_port, file_path, aes_key_bytes, public_key_path)
         messagebox.showinfo("Success", "Files sent successfully!")
     except Exception as e:
         messagebox.showerror("Error", str(e))
+
+
+
 
 # Function to reset the Receive (Server) section
 def reset_receive():
@@ -81,7 +81,7 @@ def reset_send():
     aes_key_entry.delete(0, ctk.END)
     file_listbox.delete(1.0, ctk.END)  # Reset the Textbox
     pubkey_entry.delete(0, ctk.END)
-    progress_label.configure(text="Sending files...")
+    progress_label.configure(text="Idle...")
 
 # Main GUI setup
 ctk.set_appearance_mode("System")  # Use system appearance (light/dark mode)
@@ -98,6 +98,7 @@ main_frame.pack(fill='both', expand=True, padx=20, pady=20)
 receive_frame = ctk.CTkFrame(main_frame)
 receive_frame.pack(fill='both', padx=10, pady=10)
 
+ctk.CTkLabel(receive_frame, text="Receive File (Server)", font=("Arial", 20, "bold")).grid(row=0, column=1, pady=5)
 ctk.CTkLabel(receive_frame, text="Server Port:").grid(row=1, column=0, padx=10, pady=5)
 port_entry_server = ctk.CTkEntry(receive_frame)
 port_entry_server.insert(0, "12345")
@@ -126,6 +127,7 @@ reset_button_receive.grid(row=4, column=2, padx=0, pady=10)
 send_frame = ctk.CTkFrame(main_frame)
 send_frame.pack(fill='both', padx=10, pady=10)
 
+ctk.CTkLabel(send_frame, text="Send File (Client)", font=("Arial", 20, "bold")).grid(row=0, column=1, pady=5)
 ctk.CTkLabel(send_frame, text="Server IP:").grid(row=1, column=0, padx=10, pady=5)
 ip_entry = ctk.CTkEntry(send_frame)
 ip_entry.grid(row=1, column=1, padx=10, pady=5)
@@ -157,7 +159,7 @@ reset_button_send = ctk.CTkButton(send_frame, text="Reset", command=reset_send, 
 reset_button_send.grid(row=6, column=2, padx=10, pady=10)
 
 # Add progress label in the Send frame
-progress_label = ctk.CTkLabel(send_frame, text="Sending files...")
+progress_label = ctk.CTkLabel(send_frame, text="Idle...")
 progress_label.grid(row=7, column=1, padx=10, pady=5)
 
 root.mainloop()
