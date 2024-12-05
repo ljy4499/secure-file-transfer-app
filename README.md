@@ -1,28 +1,49 @@
-# secure-file-transfer-app
+# Secure File Transfer App
 
 ## Project Description
-This project implements a Secure File Transfer Protocol using symmetric (AES) and asymmetric (RSA) encryption techniques. It aims to ensure the confidentiality, integrity, and authenticity of files transmitted between two systems. 
+
+This project is a **Secure File Transfer Application** that leverages **AES** (Advanced Encryption Standard) and **RSA** (Rivest-Shamir-Adleman) encryption techniques to ensure secure, confidential, and tamper-proof file transfers between two systems. The application features a user-friendly GUI for ease of use, allowing users to send and receive files securely.
+
+---
 
 ## Features
-- **Symmetric Encryption (AES)**: Encrypts file contents before transmission.
-- **Asymmetric Encryption (RSA)**: Securely exchanges the symmetric AES key between the client and server.
-- **File Transfer Protocol**: Implements a basic client-server architecture using TCP sockets for transmitting encrypted files.
-- **Integrity Check**: Utilizes hashing algorithms (e.g., SHA-256) to verify that files have not been tampered with during transmission.
+
+- **Symmetric Encryption (AES)**: Encrypts file contents before transmission for confidentiality.
+- **Asymmetric Encryption (RSA)**: Securely encrypts the AES key using RSA public keys.
+- **File Transfer Protocol**: Uses a client-server model with TCP sockets for reliable file transfer.
+- **Integrity Check**: Ensures data integrity using secure hashing algorithms (e.g., SHA-256).
+- **Cross-Device Communication**: Works across local and public networks (requires proper configuration).
+- **Graphical User Interface (GUI)**: Simplifies the user experience with distinct sections for sending and receiving files.
+
+---
 
 ## Requirements
-- Python 3.x
-- Required libraries:
-  - `cryptography` for AES and RSA implementations
-  - `hashlib` for SHA-256 hashing
-  - `socket` for client-server communication
 
-## Installation
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/secure-file-transfer-protocol.git
-   cd secure-file-transfer-protocol
+- **Python Version**: Python 3.7 or higher
+- **Required Libraries**: 
+  - `cryptography`
+  - `hashlib`
+  - `socket`
+  - `tkinter`
 
-2. Install the required libraries:
-    pip install cryptography
+---
 
-testesttest
+## Installation and Setup
+
+### 1. Clone the Repository
+To download the application, run one of the following commands:
+
+  ```bash
+  git clone https://github.com/ljy4499/secure-file-transfer-app.git
+  cd ~/secure-file-transfer-app
+  ```
+
+### 2. Install Dependencies
+  ```bash
+  pip install -r requirements.txt
+  ```
+
+### 3. Build Application
+  ```bash
+  pyinstall --onefile SecureFileTransfer_gui.py
+  ```

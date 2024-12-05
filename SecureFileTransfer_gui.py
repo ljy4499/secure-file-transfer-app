@@ -1,5 +1,4 @@
 import os
-import time
 import customtkinter as ctk
 from tkinter import filedialog, messagebox
 from threading import Thread
