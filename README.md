@@ -62,28 +62,26 @@ or run the 'SecureFileTransfer_gui.exe' in 'dist' folder
 
 ### 1. Run Server
 
-1) Server Port: 12345(default, change if necessary)
-2) Private Key Path: Click 'Browse' -> (previous directory) -> 'example' folder -> select 'juyoul_private_key.pem'
-3) Private Key Password: juyoul
-4) Click 'Start Server'
+- Server Port: 12345(default, change if necessary)
+- Private Key Path: Click 'Browse' -> (previous directory) -> 'example' folder -> select 'juyoul_private_key.pem'
+- Private Key Password: juyoul
+- Click 'Start Server'
 
 ### 2. Run Client
 
-1) Server IP: 127.0.0.1(default, loopback address for test, change if necessary)
-2) Server Port: 12345
-3) AES Key 32 Bytes (Hex): 1111111122222222333333334444444455555555666666667777777788888888
-4) File Path: Click 'Browse' -> (previous directory) -> 'example' folder -> select 'message.txt'
-5) Public Key Path: Click 'Browse' -> (previous directory) -> 'example' folder -> select 'juyoul_public_key.pem'
-6) Click 'Send File'
+- Server IP: 127.0.0.1(default, loopback address for test, change if necessary)
+- Server Port: 12345
+- AES Key 32 Bytes (Hex): 1111111122222222333333334444444455555555666666667777777788888888
+- File Path: Click 'Browse' -> (previous directory) -> 'example' folder -> select 'message.txt'
+- Public Key Path: Click 'Browse' -> (previous directory) -> 'example' folder -> select 'juyoul_public_key.pem'
+- Click 'Send File'
 
-### 3. Check File Transmission
+### 3. Remarks
 
--Downloaded file will be stored in /dist/download/(file_name.extension)
-
-### 4. Remarks
-
--Using this app with the public ip address may require 'port forwarding' from the router configuration
--Creating public/private key using OpenSSL
+- Downloaded file will be stored in /dist/download/(file_name.extension)
+- Using this app with the public ip address may require 'port forwarding' from the router configuration
+- Creating public/private key using OpenSSL
+  
   ```bash
   openssl genpkey -aes-256-cbc -algorithm RSA -out your_private_key.pem -pkeyopt rsa_keygen_bits:4096
   openssl rsa -in test2_private_key.pem -pubout -out your_public_key.pem
