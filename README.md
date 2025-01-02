@@ -56,6 +56,8 @@ or run the 'SecureFileTransfer_gui.exe' in 'dist' folder
 
 ---
 
+![SecureFileTransfer Application and Debugging](docs/example.png)
+
 ## Test Application
 
 ### 1. Run Server
